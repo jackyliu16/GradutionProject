@@ -21,7 +21,7 @@
   1. 基于一款文档相对来说比较全面的开发板 raspberry 4B bcm2711 进行实现
     1. 能通过串口连接设备，并且通过外置的按钮，在操作系统串口终端上输出对应信息。并且能够使某一指示灯亮起（通过引脚控制等方式）。
     2a. 能够通过 Gigabit Ethernet controller driver 或者其缩水实现，完成简单 UDP 发包实验，以能在同一局域网内或另一树莓派主机抓到对应包为准。
-        - 缩水实现指通过简化常见的多层网络协议栈形式，降低实现难度（当前选用的操作系统尚未实现对应的网卡驱动）
+        - 缩水实现指通过简化常见的多层网络协议栈形式，降低实现难度（当前选用的操作系统尚未实现对应的网卡驱动）[1](https://forums.raspberrypi.com/viewtopic.php?t=271651#p1654653) [2](https://www.eevblog.com/forum/projects/bare-metal-udp-what_s-involved/msg937862/#msg937862)
         - UDP 发包实验可由本质上简化成为最简单的以太网帧发送模式，以降低实现难度，具体只为了证明确实可以实现这样的操作。
     2b. 或者能够通过串口发送加密数据包方式，实现两台树莓派之间的通信以及授权，授权通过之后，某一指示灯亮起。
     3. 在其他操作系统（RTOS, Linux）中复现现有工作，并且尝试对比同等情况下的性能。
@@ -29,4 +29,14 @@
         - 液晶显示理论上可以通过串口输出的方式予以实现(临时)
   2. 尝试在一些相对比较便宜的开发版上复现原先实现效果，比如说 luckfox 等。
   
+
+- [bare-metal-led-access](https://raspberrypi.stackexchange.com/questions/135867/bare-metal-led-access-on-rpi-4)
+- [raspi3-tutorial](https://github.com/bztsrc/raspi3-tutorial)
+- receiving and transmitting of raw Ethernet packets
+  - [recvRawEth.c](https://gist.github.com/austinmarton/2862515) [sendRawEth.c](https://gist.github.com/austinmarton/1922600)
+- tcpdump will read traffic at layer 2
+- [genet/bcmgenet.c](https://github.com/raspberrypi/linux/blob/rpi-4.19.y/drivers/net/ethernet/broadcom/genet/bcmgenet.c)
+- [10BASE-T FPGA interface](https://www.fpga4fun.com/10BASE-T.html)
+
+
 
