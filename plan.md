@@ -23,6 +23,7 @@
     2a. 能够通过 Gigabit Ethernet controller driver 或者其缩水实现，完成简单 UDP 发包实验，以能在同一局域网内或另一树莓派主机抓到对应包为准。
         - 缩水实现指通过简化常见的多层网络协议栈形式，降低实现难度（当前选用的操作系统尚未实现对应的网卡驱动）[1](https://forums.raspberrypi.com/viewtopic.php?t=271651#p1654653) [2](https://www.eevblog.com/forum/projects/bare-metal-udp-what_s-involved/msg937862/#msg937862)
         - UDP 发包实验可由本质上简化成为最简单的以太网帧发送模式，以降低实现难度，具体只为了证明确实可以实现这样的操作。
+        - 或者说根据 arceos 的需求，直接通过实现 driver_net 中所规定的 trait, 来间接调用对应的服务。
     2b. 或者能够通过串口发送加密数据包方式，实现两台树莓派之间的通信以及授权，授权通过之后，某一指示灯亮起。
     3. 在其他操作系统（RTOS, Linux）中复现现有工作，并且尝试对比同等情况下的性能。
     3. 提供更多其他识别驱动支持，比如说指纹识别，NFC，ID卡，液晶显示等现代考勤系统中常见的驱动模块。
