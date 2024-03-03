@@ -12,13 +12,21 @@
         - 首先是在原先基础上的改进，尝试通过添加一对串口输入输出，实现对于外界按钮输入的获取，并且直接反馈到亮灯或者无缘蜂鸣器。
         - 其次是通过分析[前人工作经验](https://github.com/orgs/rcore-os/discussions/30)，尝试对于网卡驱动进行剪枝实现。
             - 他们主要是针对于 Cvitek DWMAC 这个驱动进行的实现
-            - 根据设备树反汇编可以知道我需要实现的是 brcm,genet-mdio-v5 驱动，应该还是有一些相同的地方的。
+            - 根据设备树反汇编可以知道我需要实现的是 brcm,genet-mdio-v5 驱动 (树莓派使用BCM54213PE芯片[#ref](https://zhuanlan.zhihu.com/p/658073678))，应该还是有一些相同的地方的。
             比如说[Cvitek](https://github.com/orgs/rcore-os/discussions/30#discussioncomment-6745603) 和 [broadcom](https://forums.raspberrypi.com/viewtopic.php?t=294815#p1779679) 都采用类似的布局，
             即在 Soc 中包含一个 genet controller 还有一个 broadcom RGMII<->ethernet PHY 芯片。
             - 找到了一个可以发送以太网帧的[脚本](https://github.com/coding-fans/netcode/tree/master/src/c/sendether)
             - 有一个相关教程，说了一嘴他们使用了 MIO(Multiplexed I/O) 经由 RGMII 接口连接 PS，外加通过 EMIO 提供了 GMII 的接口防止有些地方需要实例化某些 PHY 子层。
             > the MAC Transmitter and Receiver modules (in the PS) are connected to a FIFO, which, in turn, exchanges data with memory through a DMA controller. When transmitting, data is first fetched from memory and written into this FIFO, then the FIFO passes this data on to the MAC Tx chain. In the opposite direction, the MAC Rx writes the received data into the FIFO, and the DMA sends this data to memory. This is depicted below in the diagram of the Ethernet controller.
             ![](https://igorfreire-personal-page.s3.us-east-1.amazonaws.com/wp-content/uploads/2016/11/07203043/1000base_t_osi_relationship_802_3_clause_40-1536x1188.png)
+    - 一些链接
+        - https://github.com/raspberrypi/linux/tree/rpi-5.4.y/drivers/net/ethernet/broadcom/genet
+        - https://github.com/u-boot/u-boot/blob/master/drivers/net/bcmgenet.c
+        - https://github.com/openbsd/src/blob/master/sys/dev/ic/bcmgenet.c
+        - https://github.com/rsta2/circle/blob/master/lib/bcm54213.cpp
+        - https://github.com/RT-Thread/rt-thread/blob/master/bsp/raspberry-pi/raspi4-32/driver/drv_eth.c
+        - 树莓派4有线网卡驱动调试笔记: https://cloud.tencent.com/developer/article/1758280
+        - BCM54213PE_datasheet.PDF: https://gitee.com/bigmagic/raspi_sd_fw/blob/master/doc/raspi4/BCM54213PE_datasheet.PDF
 
             
 
