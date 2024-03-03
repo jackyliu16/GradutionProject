@@ -2,7 +2,7 @@
 - 2/29 最终找到了调试失败的罪魁祸首，前面的人在复制别人代码的时候并没有注意到他在进行 jtag 调试的时候所使用的镜像与 chainboot 使用的镜像不同，
 只修改 chainboot 的镜像并不会影响最终传输到板子上的仍然是 [rust-raspberrypi-OS-tutorials](https://github.com/rust-embedded/rust-raspberrypi-OS-tutorials)
 提供的原始镜像文件（基本上约等于 wfe），他所看到的 load failure 实际上并不是因为加载错误而导致。这也告诉我一个问题，在对别人的工作进行 debug 的时候，
-首先要检查前人工作是否出现过失。[record](https://jackyliu16.bitbucket.io/jtag-load-failure-debug-cn/) *[可能网站还没更新，原始文件](https://bitbucket.org/jackyliu16/blog/src/master/content/jtag-load-failure-debug.cn.md)
+首先要检查前人工作是否出现过失。[record](https://jackyliu16.bitbucket.io/jtag-load-failure-debug-cn/) 
 - 3/1 最终完成 Openocd 修复，便携化输出以及对应的[教程文档](https://bitbucket.org/jackyliu16/blog/src/master/content/jtag-debug-in-raspi4.md)，提交了 [PR](https://github.com/arceos-usb/arceos_experiment/pull/11), 目前已经被合并到 usb-next 分支。
 - 3/3 完成了一个[简单的 GPIO 库](https://bitbucket.org/jackyliu16/arceos/commits/06efd8ba8dc1592cc678d07eb6cdb4740d48e3d9)的实现（单线程），现在已经可以通过 unsafe 的 寄存器操作，实现对于 raspberry4B 开发版上引脚的管理。 
 并且通过简单的 LED 调用以及万能表测试，说明这套 GPIO 库已经实现了他的效果。
