@@ -50,6 +50,7 @@
         - [enc28j60](https://crates.io/crates/enc28j60): A platform agnostic driver to interface the ENC28J60 (Ethernet controller)
             这个是基于 [embedded-hal] 实现的，应该可以用？找不到之前印象中出现的那个限制主控说明了。
         - [embedded-nal](https://github.com/rust-embedded-community/embedded-nal):  An Embedded Network Abstraction Layer
+        - [smoltcp-nal](https://github.com/quartiq/smoltcp-nal):  An embedded-nal implementation for smoltcp
         - [embassy-start](https://github.com/titanclass/embassy-start): A template repository that accomodates a couple of applications and a shared library for embedded asynchronous Rust using the Embassy executor and Hardware Abstraction Layers.
 
     ![](https://pic1.zhimg.com/v2-f3379c539011186d8b1fbaa5265064f4_r.jpg)
