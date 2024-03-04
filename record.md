@@ -25,8 +25,19 @@
         - https://github.com/openbsd/src/blob/master/sys/dev/ic/bcmgenet.c
         - https://github.com/rsta2/circle/blob/master/lib/bcm54213.cpp
         - https://github.com/RT-Thread/rt-thread/blob/master/bsp/raspberry-pi/raspi4-32/driver/drv_eth.c
+        - https://zhuanlan.zhihu.com/p/658073678
         - 树莓派4有线网卡驱动调试笔记: https://cloud.tencent.com/developer/article/1758280
         - BCM54213PE_datasheet.PDF: https://gitee.com/bigmagic/raspi_sd_fw/blob/master/doc/raspi4/BCM54213PE_datasheet.PDF
 
-            
+- 3/4 
+    - 找到一个方式，可以尝试通过 SPI 调用外部其他网络模块，而不一定需要一棵树上吊死 
+        - [Bare metal networking/Ethernet on Raspberry Pi 4](https://forums.raspberrypi.com/viewtopic.php?t=323242#p1934604)
+        - [Writing a “bare metal” operating system for Raspberry Pi 4 (Part 14)](https://www.rpi4os.com/part14-spi-ethernet/)
+
+        - 类似的还有[Weekly driver 4: ENC28J60, Ethernet for your microcontroller](http://blog.japaric.io/wd-4-enc28j60/)，
+        这个似乎是基于 [rust-embedded/embedded-hal] 下的一个目前已经被删除的 crates 完成的。
+        仓库目前已经处于弃用阶段，同时似乎 rpi4 不在默认支持行列。
+        - 董卓睿学长建议通过[Hi-Link/海凌科FPM383F识别指纹模块功耗低半导体面阵传感器]来实现指纹识别效果，
+        说是这个模块可以直接通过 UART 直接读。
+
 
