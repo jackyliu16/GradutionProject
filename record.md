@@ -39,5 +39,18 @@
         仓库目前已经处于弃用阶段，同时似乎 rpi4 不在默认支持行列。
         - 董卓睿学长建议通过[Hi-Link/海凌科FPM383F识别指纹模块功耗低半导体面阵传感器]来实现指纹识别效果，
         说是这个模块可以直接通过 UART 直接读。
+    - 在 [Owner avatar awesome-embedded-rust ](https://github.com/rust-embedded/awesome-embedded-rust?tab=readme-ov-file#raspberry-pi-silicon)
+    上找的一些有关的库。
+        - [rainbow-hat-rs](https://crates.io/crates/rainbow-hat-rs):  Rust Driver for the Rainbow HAT for Raspberry Pi. 
+            看上去是个单独的模块集成，估计没什么用
+        - [rp2040-hal](https://crates.io/crates/rp2040-hal):  A Rust Embeded-HAL impl for the rp2040 microcontroller
+            可能可以提供某种程度上的参考
+        - [cortex-a](https://github.com/rust-embedded/cortex-a):  Low level access to Cortex-A processors
+            看 README 似乎就是 aarch64-cpu 的定制化产品？
+        - [enc28j60](https://crates.io/crates/enc28j60): A platform agnostic driver to interface the ENC28J60 (Ethernet controller)
+            这个是基于 [embedded-hal] 实现的，应该可以用？找不到之前印象中出现的那个限制主控说明了。
+        - [embedded-nal](https://github.com/rust-embedded-community/embedded-nal):  An Embedded Network Abstraction Layer
+        - [embassy-start](https://github.com/titanclass/embassy-start): A template repository that accomodates a couple of applications and a shared library for embedded asynchronous Rust using the Embassy executor and Hardware Abstraction Layers.
 
+    ![](https://pic1.zhimg.com/v2-f3379c539011186d8b1fbaa5265064f4_r.jpg)
 
