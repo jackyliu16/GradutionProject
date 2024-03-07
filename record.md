@@ -1,3 +1,4 @@
+> 其他日志可以在 [blog](https://jackyliu16.bitbucket.io/) [src](https://bitbucket.org/jackyliu16/blog/src/master/)
 - 更早的进度不可考究 ... 但是大体上可以认定为在摆烂 ( 没什么时间弄
 - 2/29 最终找到了调试失败的罪魁祸首，前面的人在复制别人代码的时候并没有注意到他在进行 jtag 调试的时候所使用的镜像与 chainboot 使用的镜像不同，
 只修改 chainboot 的镜像并不会影响最终传输到板子上的仍然是 [rust-raspberrypi-OS-tutorials](https://github.com/rust-embedded/rust-raspberrypi-OS-tutorials)
@@ -29,8 +30,8 @@
         - 树莓派4有线网卡驱动调试笔记: https://cloud.tencent.com/developer/article/1758280
         - BCM54213PE_datasheet.PDF: https://gitee.com/bigmagic/raspi_sd_fw/blob/master/doc/raspi4/BCM54213PE_datasheet.PDF
 
-- 3/4 
-    - 找到一个方式，可以尝试通过 SPI 调用外部其他网络模块，而不一定需要一棵树上吊死 
+- 3/4
+    - 找到一个方式，可以尝试通过 SPI 调用外部其他网络模块，而不一定需要一棵树上吊死
         - [Bare metal networking/Ethernet on Raspberry Pi 4](https://forums.raspberrypi.com/viewtopic.php?t=323242#p1934604)
         - [Writing a “bare metal” operating system for Raspberry Pi 4 (Part 14)](https://www.rpi4os.com/part14-spi-ethernet/)
 
