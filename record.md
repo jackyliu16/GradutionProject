@@ -56,8 +56,21 @@
 
     ![](https://pic1.zhimg.com/v2-f3379c539011186d8b1fbaa5265064f4_r.jpg)
 
-- 3/5 今天基本上还在沿着前面一天的继续往后看，还根据朱懿同志的建议把前面的那个 [BCM54213PE] 手册看完了，基本上了解了 MAC 与 BCM54213PE 核心的 MDIO 通信逻辑，
+- 3/5-8 今天基本上还在沿着前面一天的继续往后看，还根据朱懿同志的建议把前面的那个 [BCM54213PE] 手册看完了，基本上了解了 MAC 与 BCM54213PE 核心的 MDIO 通信逻辑，
     接下来就是基于现有的基础，尝试进一步理解原先的代码，比如说 [circle] 这种以 cpp 进行的实现带有面向对象的属性，相对来说应该较原始的 c 实现而言更好懂。
     不过好像似乎也不需要明白其中的设计逻辑，某人说像是这种移植的代码其实不太需要考虑其运行逻辑，能跑起来就好。
     最近真的状态不是很好，脑子晃荡晃荡的 ... 本来说 3/10 给初稿的，但是现在的进度其实还没有达到一个能给出初稿的地步，还得加油了。
+    
+    - DMA: 直接内存访问（Direct Memory Access）[ref](https://blog.csdn.net/phunxm/article/details/9452575) [man](https://www.openhacks.com/uploadsproductos/ar9331_datasheet.pdf)
+        - 使我们可以在进行内存或者外设数据传输的时候，不经由 CPU 控制数据传输，转而通过 DMA 控制器。
+        会在数据量特别大，速度特别快或者数据特别小，速度特别慢的时候，通过 DMA 的方式加速数据传输。
+        - 代码中所指的 DMAC 特指 DMA 控制器。
+        - 在一般实现中，DMA 会分为两种映射接口，一种是一致性映射（linux: dma_alloc_coherent），另一种是流式映射（dma_map_single）
+    - Mailbox: 一种驱动框架，通过消息队列和中断驱动信号处理多处理器通信
+        - 目前看来通过 mailbox 的实现并不是必要的
+    - MDF: multifunction device [ref](https://blog.csdn.net/subfate/article/details/53464641)
+        将设备注册到 platform 总线？
+        感觉是不是有点类似 modules/axdriver 的效果？
+        
+        
 
