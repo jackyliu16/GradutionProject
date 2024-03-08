@@ -71,6 +71,13 @@
     - MDF: multifunction device [ref](https://blog.csdn.net/subfate/article/details/53464641)
         将设备注册到 platform 总线？
         感觉是不是有点类似 modules/axdriver 的效果？
-        
+- 3/8 今天熟悉了 arceos 上类似网卡驱动的调用堆栈，同时基于 bcm2711 实现了基于 tock_register 的 DMA controller mapping.
+    [commit](https://bitbucket.org/jackyliu16/arceos/commits/d67fdcd64e27f28d3139b2fb9a8607ded6099e05)
+    126131f..821d48d
+    - 重新学习了 rust trait [ref](https://rust-book.junmajinlong.com/ch11/00.html),
+    基本了解了原先华山派上 Cvitek 的实现过程，即通过 CvitekNicTraitImpl 对于 CvitekNicTrait 的实现，
+    和 axdriver[module] 中对于 CvitekNicTraitImpl 的传递，实现了在 driver_net[crate] 中调用 modules 层面已经完成的实现
+    比如说 axhal 下的 paging 功能。
+    (有点不太明白这个地方和之前说特性的时候提到的 crate_interface 有什么关系据，据说这个东西是一个可以在用户层面注册的用户驱动方法)
         
 
