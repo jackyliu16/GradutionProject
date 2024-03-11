@@ -83,3 +83,74 @@
 
 - 3/9 写了下论文，把驱动程序在操作系统上跑起来了
 - 3/10 根据 circle 原有的驱动程序，尝试将其移植的过程中出现，异常 panic 的情况，经过检查，发现二者寄存器操作完全一致，尚不了解为什么会出现这种情况。
+- 3/11 经过一天的调试之后，发现问题出在下面这段代码
+
+    ```rust
+    let reg = read_volatile_wrapper!(ARM_BCM54213_BASE + GENET_UMAC_OFF + UMAC_MAX_FRAME_LEN);
+    trace!("reg :{reg:0>32b}");
+    write_volatile_wrapper!(
+        ENET_MAX_MTU_SIZE,
+        ARM_BCM54213_BASE + GENET_UMAC_OFF + UMAC_MAX_FRAME_LEN
+    );
+    write_volatile(
+        (ARM_BCM54213_BASE + GENET_UMAC_OFF + UMAC_MAX_FRAME_LEN) as *mut u32,
+        ENET_MAX_MTU_SIZE as u32,
+    );
+    trace!("ENET_MAX_MTU_SIZE: {ENET_MAX_MTU_SIZE:0>32b}");
+        let reg = read_volatile_wrapper!(ARM_BCM54213_BASE + GENET_UMAC_OFF + UMAC_MAX_FRAME_LEN);
+    ```
+
+    其中对应的宏如下：
+
+    ```rust
+    // Generate I/O inline functions
+    // #define GENET_IO_MACRO(name, offset)				\
+    // static inline u32 name##_readl(u32 off)				\
+    // {								\
+    // 	return read32 (ARM_BCM54213_BASE + offset + off);	\
+    // }								\
+    // static inline void name##_writel(u32 val, u32 off)		\
+    // {								\
+    // 	write32 (ARM_BCM54213_BASE + offset + off, val);	\
+    // }
+    macro_rules! write_volatile_wrapper {
+        // NOTE: Inverted for easy inspection
+        ($val:expr, $reg:expr) => {
+            write_volatile((($reg) as *mut usize), $val);
+        };
+    }
+
+    macro_rules! read_volatile_wrapper {
+        ($reg:expr) => {
+            read_volatile(($reg as *const u32));
+        };
+    }
+
+    use crate::consts::*;
+    macro_rules! genet_io {
+        ("ext", $reg:expr) => {
+            (ARM_BCM54213_BASE + GENET_EXT_OFF + $reg)
+        };
+        ("umac", $reg:expr) => {
+            (ARM_BCM54213_BASE + GENET_UMAC_OFF + $reg)
+        };
+        ("sys", $reg:expr) => {
+            (ARM_BCM54213_BASE + GENET_SYS_OFF + $reg)
+        };
+        ("intrl2_0", $reg:expr) => {
+            (ARM_BCM54213_BASE + GENET_INTRL2_0_OFF + $reg)
+        };
+        ("intrl2_1", $reg:expr) => {
+            ARM_BCM54213_BASE + GENET_INTRL2_1_OFF + $reg
+        };
+        ("hfb", $reg:expr) => {
+            ARM_BCM54213_BASE + HFB_OFFSET + $reg
+        };
+        ("hfb_reg", $reg:expr) => {
+            ARM_BCM54213_BASE + HFB_REG_OFFSET + $reg
+        };
+        ("rbuf", $reg:expr) => {
+            ARM_BCM54213_BASE + GENET_RBUF_OFF + $reg
+        };
+    }
+    ```
