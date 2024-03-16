@@ -155,9 +155,10 @@
     }
     ```
 3/12-3/16: 网卡驱动调试，中间有几天比较颓废，摆烂了下
-    1. 问题一： mdio_read 中调用 mdio_wait 可能实现不正确，返回值异常：
 
-    此处实现采用由 circle 使用的为 clock tick，但是在我实现的时候使用 A::current_time() 替换了这个部分，并且没有修改对应 CLOCKHZ 的参数可能产生错误。
+1. 问题一： mdio_read 中调用 mdio_wait 可能实现不正确，返回值异常：
+
+此处实现采用由 circle 使用的为 clock tick，但是在我实现的时候使用 A::current_time() 替换了这个部分，并且没有修改对应 CLOCKHZ 的参数可能产生错误。
 
 ```cpp
 do
@@ -169,40 +170,51 @@ do
 while (umac_readl(UMAC_MDIO_CMD) & MDIO_START_BUSY);
 ```
         
-    2. 由于操作寄存器号移位不正确可能导致错误
+2. 由于操作寄存器号移位不正确可能导致错误
 
-```rust
-    // 按照 MDIO 通信标准进行通信操作
-    // 此处 PHY_ID 可能设置不正确
-    let cmd = MDIO_RD | (PHY_ID << MDIO_PMD_SHIFT) | (reg << MDIO_PWD_SHIFT);
-    write_volatile_wrapper!(cmd as u32, genet_io!("mdio", MDIO_CMD));
+    ```rust
+        // 按照 MDIO 通信标准进行通信操作
+        // 此处 PHY_ID 可能设置不正确
+        let cmd = MDIO_RD | (PHY_ID << MDIO_PMD_SHIFT) | (reg << MDIO_PWD_SHIFT);
+        write_volatile_wrapper!(cmd as u32, genet_io!("mdio", MDIO_CMD));
 
-    let cmd = read_volatile_wrapper!(genet_io!("mdio", MDIO_CMD));
-    debug!("write  cmd: {cmd:0>32b}"); // 此处显示与前文行为保持一致
+        let cmd = read_volatile_wrapper!(genet_io!("mdio", MDIO_CMD));
+        debug!("write  cmd: {cmd:0>32b}"); // 此处显示与前文行为保持一致
 
-    self.mdio_start(); // busy self.mdio_wait();
+        self.mdio_start(); // busy self.mdio_wait();
 
-    A::udelay(2); // 尝试，未改善结果
+        A::udelay(2); // 尝试，未改善结果
 
-    let cmd = read_volatile_wrapper!(genet_io!("mdio", MDIO_CMD));
-    debug!("wait   cmd: {cmd:0>32b}");
+        let cmd = read_volatile_wrapper!(genet_io!("mdio", MDIO_CMD));
+        debug!("wait   cmd: {cmd:0>32b}");
 
-    if cmd & (MDIO_READ_FAIL as u32) == 1 {
-        warn!("mdio_read Failure");
-        return -1;
-    }
+        if cmd & (MDIO_READ_FAIL as u32) == 1 {
+            warn!("mdio_read Failure");
+            return -1;
+        }
 
-    let cmd = read_volatile_wrapper!(genet_io!("mdio", MDIO_CMD));
-    debug!("wait 2 cmd: {cmd:0>32b}"); 
-    // 此处与前文 wait cmd 输出结果不一致，其中 后者 BUSY 位被清空，同时在后 16 位中出现了由 PHY 发送的数据信息。
+        let cmd = read_volatile_wrapper!(genet_io!("mdio", MDIO_CMD));
+        debug!("wait 2 cmd: {cmd:0>32b}"); 
+        // 此处与前文 wait cmd 输出结果不一致，其中 后者 BUSY 位被清空，同时在后 16 位中出现了由 PHY 发送的数据信息。
 
-    debug!("(cmd) :        : {}, \t{:0>32b}", cmd, cmd);
-    debug!("(cmd & 0xFFFF): {}, \t{:0>32b}", cmd & 0xFFFF, cmd & 0xFFFF);
+        debug!("(cmd) :        : {}, \t{:0>32b}", cmd, cmd);
+        debug!("(cmd & 0xFFFF): {}, \t{:0>32b}", cmd & 0xFFFF, cmd & 0xFFFF);
 
-    (cmd & 0xFFFF) as isize
-```
+        (cmd & 0xFFFF) as isize
+    ```
     
     在这个地方 (reg << MDIO_REG_SHIFT) 被错误写成 (reg << MDIO_PWD_SHIFT), 可能导致错误。
 
-    3. 在类似 circle 实现 clrbits_32 的时候，在对寄存器进行 `reg &= !(clear) as u32` 的时候忘记加上 `=`，导致实际上并没有完成清除位操作。
+3. 在类似 circle 实现 clrbits_32 的时候，在对寄存器进行 `reg &= !(clear) as u32` 的时候忘记加上 `=`，导致实际上并没有完成清除位操作。
+
+4. 经过调试，发现是可以通过 mdio 修改 10h 寄存器中的 04？ 位，强制启用 RJ-45 的 LED 功能，
+这说明在 MAC 与 RJ-45 之间经由 BCM54213PE(PHY) 的通信正常，
+经过查阅文档以及 MII Status register(0x01) 显示 link_status == 0，PHY Extended Status(0x11) 显示 locked == 0, link_status == 0 
+说明当前解扰器(Descrambler) 并没有锁定。
+
+> The descrambler locks to the scrambler state after detecting a sufficient number of consecutive idle codes.
+
+感觉有两种可能会导致这个情况，(1) 由于前导一未被检出 (2) 由于 RGMII_MDC 未配置
+(1): 在 circle, u-boot 等实现中似乎均没有体现前导一的存在，感觉应该会是不需要的？但是需要测试以确保这个理解是正确的
+(2): 可能由于 RGMII_MDC 相关的时钟信号实际上并不在对应 bcmgenet 实现文件中完成，我没抄到这个函数。
 
