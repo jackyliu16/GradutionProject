@@ -154,3 +154,55 @@
         };
     }
     ```
+3/12-3/16: 网卡驱动调试，中间有几天比较颓废，摆烂了下
+    1. 问题一： mdio_read 中调用 mdio_wait 可能实现不正确，返回值异常：
+
+    此处实现采用由 circle 使用的为 clock tick，但是在我实现的时候使用 A::current_time() 替换了这个部分，并且没有修改对应 CLOCKHZ 的参数可能产生错误。
+
+```cpp
+do
+{
+	if (m_pTimer->GetClockTicks ()-nStartTicks >= CLOCKHZ / 100) {
+		break;
+	}
+}
+while (umac_readl(UMAC_MDIO_CMD) & MDIO_START_BUSY);
+```
+        
+    2. 由于操作寄存器号移位不正确可能导致错误
+
+```rust
+    // 按照 MDIO 通信标准进行通信操作
+    // 此处 PHY_ID 可能设置不正确
+    let cmd = MDIO_RD | (PHY_ID << MDIO_PMD_SHIFT) | (reg << MDIO_PWD_SHIFT);
+    write_volatile_wrapper!(cmd as u32, genet_io!("mdio", MDIO_CMD));
+
+    let cmd = read_volatile_wrapper!(genet_io!("mdio", MDIO_CMD));
+    debug!("write  cmd: {cmd:0>32b}"); // 此处显示与前文行为保持一致
+
+    self.mdio_start(); // busy self.mdio_wait();
+
+    A::udelay(2); // 尝试，未改善结果
+
+    let cmd = read_volatile_wrapper!(genet_io!("mdio", MDIO_CMD));
+    debug!("wait   cmd: {cmd:0>32b}");
+
+    if cmd & (MDIO_READ_FAIL as u32) == 1 {
+        warn!("mdio_read Failure");
+        return -1;
+    }
+
+    let cmd = read_volatile_wrapper!(genet_io!("mdio", MDIO_CMD));
+    debug!("wait 2 cmd: {cmd:0>32b}"); 
+    // 此处与前文 wait cmd 输出结果不一致，其中 后者 BUSY 位被清空，同时在后 16 位中出现了由 PHY 发送的数据信息。
+
+    debug!("(cmd) :        : {}, \t{:0>32b}", cmd, cmd);
+    debug!("(cmd & 0xFFFF): {}, \t{:0>32b}", cmd & 0xFFFF, cmd & 0xFFFF);
+
+    (cmd & 0xFFFF) as isize
+```
+    
+    在这个地方 (reg << MDIO_REG_SHIFT) 被错误写成 (reg << MDIO_PWD_SHIFT), 可能导致错误。
+
+    3. 在类似 circle 实现 clrbits_32 的时候，在对寄存器进行 `reg &= !(clear) as u32` 的时候忘记加上 `=`，导致实际上并没有完成清除位操作。
+
