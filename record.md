@@ -218,3 +218,4 @@ while (umac_readl(UMAC_MDIO_CMD) & MDIO_START_BUSY);
 (1): 在 circle, u-boot 等实现中似乎均没有体现前导一的存在，感觉应该会是不需要的？但是需要测试以确保这个理解是正确的
 (2): 可能由于 RGMII_MDC 相关的时钟信号实际上并不在对应 bcmgenet 实现文件中完成，我没抄到这个函数。
 
+能否通过 回环测试来确定是否 PHY 芯片工作正常？
