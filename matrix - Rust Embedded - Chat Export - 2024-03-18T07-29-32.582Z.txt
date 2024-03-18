@@ -1,0 +1,54 @@
+Mon, Mar 18, 2024, 15:04:00 - oneDragon: emm, what is the common ways to use jtag?
+I found a kind of feature names Boundary Scan, but i have no ideas about how to use it (
+Mon, Mar 18, 2024, 15:05:48 - oneDragon: I saw a blog (EEVblog) use XJAnalyser, but seems this application was provide with boards
+right now seems i could only use openocd or other opensource apps
+Mon, Mar 18, 2024, 15:06:09 - K900 ⚡️: To use JTAG to do what? 
+Mon, Mar 18, 2024, 15:06:58 - oneDragon: try to test if MDC(bcmgenet) is working.
+Mon, Mar 18, 2024, 15:07:59 - oneDragon: I am porting a NIC driver now, but there is no way to boot the PHY chip correctly
+> The BCM54213PE enables transmission and reception of packet data only when the descrambler is locked. 
+Mon, Mar 18, 2024, 15:07:58 - Lumpio-: The Linux driver bcmgenet...?
+Mon, Mar 18, 2024, 15:08:03 - K900 ⚡️: On your own board design? Or an existing one? Does it even have debug points broken out? 
+Mon, Mar 18, 2024, 15:08:10 - Lumpio-: oh like your own driver
+Mon, Mar 18, 2024, 15:08:24 - oneDragon: yes, just use raspiberry4B
+Mon, Mar 18, 2024, 15:08:55 - Lumpio-: Ok so are you running linux or not
+Mon, Mar 18, 2024, 15:09:16 - oneDragon: but wasn't usual kernel, so i have to convert it to make network run
+I don't use linux right now, in fact I wish I could.
+Mon, Mar 18, 2024, 15:09:43 - Lumpio-: You need to provide a bit of background for anybody to be able to understand what it is that you're trying to debug
+Mon, Mar 18, 2024, 15:09:49 - Lumpio-: Is "not usual kernel" a Linux kernel or not
+Mon, Mar 18, 2024, 15:10:04 - Lumpio-: What kind of kernel is it then
+Mon, Mar 18, 2024, 15:09:57 - K900 ⚡️: And what are you trying to achieve with JTAG here
+Mon, Mar 18, 2024, 15:11:03 - oneDragon: I don't know the classification of this kernel, but it was written by rust and designed based on unikernel design principles.
+Mon, Mar 18, 2024, 15:11:04 - K900 ⚡️: Like, there's no separate JTAG connection for the Ethernet block on the SoC, you get debug access to the CPU cores, but if you're writing your own driver, you already have that?
+Mon, Mar 18, 2024, 15:11:31 - K900 ⚡️: Can you name the kernel? 
+Mon, Mar 18, 2024, 15:11:37 - K900 ⚡️: Or is it something you wrote yourself? 
+Mon, Mar 18, 2024, 15:12:22 - Lumpio-: I don't know if the Soc has that, and if it's documented, but boundary scan could technically get you access to internal signals between the CPU and Ethernet controller, if they're in the same SoC, but whether that's the easiest way of debugging your thing is another question
+Mon, Mar 18, 2024, 15:12:29 - oneDragon: I am copying the register operation in the original driver now, but the feedback above is wrong. link\_status is not established successfully. 
+
+I am now considering checking through JTAG to see if RGMII\_MDC provides a signal, since I did not implement this part, basically what i done is just convert c register operation into rust.
+Mon, Mar 18, 2024, 15:12:57 - oneDragon: <@k900:0upti.me "Can you name the kernel?"> arceos https://github.com/rcore-os/arceos
+Mon, Mar 18, 2024, 15:13:37 - Lumpio-: interesting, never heard of this one
+Mon, Mar 18, 2024, 15:15:35 - K900 ⚡️: JTAG won't help you with that because that SoC doesn't provide access beyond the CPU with it 
+Mon, Mar 18, 2024, 15:15:57 - K900 ⚡️: I believe you can get _some_ more access with some soldering to get to the test points on the GPU
+Mon, Mar 18, 2024, 15:16:28 - K900 ⚡️: But I don't think that will get you to the networking hardware 
+Mon, Mar 18, 2024, 15:16:38 - K900 ⚡️: You probably need some proprietary Broadcom arcana for that 
+Mon, Mar 18, 2024, 15:17:22 - oneDragon: <@k900:0upti.me "Like, there's no separate JTAG c..."> emm, what's your means of Ethernet block?
+is it a kind of PHY like bcm54213 or MAC impl in Soc? like mdio connection or others?
+Mon, Mar 18, 2024, 15:18:31 - K900 ⚡️: The Ethernet block is the MAC on the SoC
+Mon, Mar 18, 2024, 15:18:43 - K900 ⚡️: The actual phy does not have any test points at all 
+Mon, Mar 18, 2024, 15:18:48 - K900 ⚡️: As far as I can find anyway 
+Mon, Mar 18, 2024, 15:18:55 - K900 ⚡️: It's possible there's more proprietary Broadcom arcana
+Mon, Mar 18, 2024, 15:19:15 - K900 ⚡️: But I wouldn't be surprised if it's physically disabled for production units 
+Mon, Mar 18, 2024, 15:19:53 - Lumpio-: My understanding was "it's all inside the same chip and there's no documented way to look at the internal control signals"
+Mon, Mar 18, 2024, 15:20:03 - K900 ⚡️: The phy is a separate chip 
+Mon, Mar 18, 2024, 15:20:08 - K900 ⚡️: But the rest of it, yes 
+Mon, Mar 18, 2024, 15:20:19 - K900 ⚡️: And Broadcom is notoriously controlling of their internal documentation 
+Mon, Mar 18, 2024, 15:20:45 - K900 ⚡️: So it's not like a Rockchip or Mediatek where you can just find a datasheet on a random FTP server 
+Mon, Mar 18, 2024, 15:21:39 - K900 ⚡️: I don't know how true that actually is, but I have second hand information from decently trusted sources that even the RPi Foundation doesn't have full documentation access 
+Mon, Mar 18, 2024, 15:22:50 - oneDragon: Well, let me see if there's any way to test this.  thk about the help .
+Mon, Mar 18, 2024, 15:23:15 - K900 ⚡️: The way to test this would probably be to just poke the relevant registers yourself from the driver 
+Mon, Mar 18, 2024, 15:23:45 - oneDragon: I know, the datasheet of bcm54213 I have now also took a lot of effort to get （
+Mon, Mar 18, 2024, 15:23:30 - K900 ⚡️: Or from a probe attached to the CPU if you really want to go down that route
+Mon, Mar 18, 2024, 15:23:38 - K900 ⚡️: And observe the results 
+Mon, Mar 18, 2024, 15:24:08 - K900 ⚡️: But generally you've chosen a really bad platform to write drivers for 
+Mon, Mar 18, 2024, 15:24:20 - K900 ⚡️: At least unless you're a Broadcom employee, which you're clearly not
+Mon, Mar 18, 2024, 15:26:36 - oneDragon: To be honest, I'm thinking about something else right now. like ENC28J60 Ethernet module via spi ...
