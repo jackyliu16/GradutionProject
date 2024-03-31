@@ -224,3 +224,5 @@ NOTE: 看上去由於樹莓派主板上 broadcom 的 PHY 芯片沒有與 JTAG �
 
 3/24: 感覺連續擺爛了好幾天的樣子，目前在 broadcom PHY 上沒有進展，不能排除上述任何原因，
 目前嘗試將助攻方向轉換成爲 ENC28J60 芯片 SPI 支持。
+
+- http://blog.japaric.io/wd-4-enc28j60/
