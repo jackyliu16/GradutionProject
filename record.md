@@ -226,3 +226,4 @@ NOTE: 看上去由於樹莓派主板上 broadcom 的 PHY 芯片沒有與 JTAG �
 目前嘗試將助攻方向轉換成爲 ENC28J60 芯片 SPI 支持。
 
 - http://blog.japaric.io/wd-4-enc28j60/
+- 4/16： 完成UART串口初次测试和以太网卡测试，均可以实现简单的收发包，目前正在等待重构。
