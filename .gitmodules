@@ -1,3 +1,12 @@
 [submodule "docs"]
 	path = docs
 	url = git@github.com:jackyliu16/Sync.git
+[submodule "test_script"]
+	path = test_script
+	url = git@bitbucket.org:jackyliu16/udp-tester.git
+[submodule "hosts_backend"]
+	path = hosts_backend
+	url = git@bitbucket.org:jackyliu16/attendance_system_backend.git
+[submodule "arceos"]
+	path = arceos
+	url = git@bitbucket.org:jackyliu16/arceos.git
