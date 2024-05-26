@@ -10,3 +10,6 @@
 [submodule "arceos"]
 	path = arceos
 	url = git@bitbucket.org:jackyliu16/arceos.git
+[submodule "Thesis"]
+	path = Thesis
+	url = git@github.com:jackyliu16/Graduation_Thesis.git
